@@ -1,0 +1,128 @@
+<html>
+
+<head>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="vendor/toastr/build/toastr.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="vendor/toastr/build/toastr.min.js"></script>
+
+</head>
+
+<body>
+<div class="container">
+    <div class="page-header">
+        <h1>FireBase Example for User Registration</h1>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <form method="post" action="#" id="user-registration-form">
+                <div class="form-group">
+                    <label for="user_name">Name:</label>
+                    <input type="text" class="form-control" id="user_name" name="name">
+                </div>
+                <div class="form-group">
+                    <label for="user_email">Email address:</label>
+                    <input type="email" class="form-control" id="user_email" name="email">
+                </div>
+
+                <button id="save-user" class="btn btn-default">Submit</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+<script src="https://www.gstatic.com/firebasejs/4.8.0/firebase.js"></script>
+<script>
+
+    $(function() {
+        $( "#user-registration-form" ).validate({
+            rules: {
+                name: {
+                    required: true
+                },
+                email: {
+                    required: true,
+                    email: true
+                }
+            },
+            messages: {
+                name: {
+                    required: "The name is required"
+                },
+                email: {
+                    required: "The email is required"
+                }
+            }
+        });
+    });
+
+    // Initialize Firebase
+    var config = {
+        apiKey: "AIzaSyC8KsHGuOJ3CpCMN2lreJDPIhBeF99i1iM",
+        authDomain: "email-campaign-d4d16.firebaseapp.com",
+        databaseURL: "https://email-campaign-d4d16.firebaseio.com",
+        projectId: "email-campaign-d4d16",
+        storageBucket: "email-campaign-d4d16.appspot.com",
+        messagingSenderId: "298195456972"
+    };
+    firebase.initializeApp(config);
+    // Get a reference to the database service
+    var database = firebase.database();
+
+    $( "#save-user" ).on( "click", function(e) {
+        var name = $("#user_name").val();
+        var email = $("#user_email").val();
+        if ($("#user-registration-form").valid()) {
+            writeUserData(name, email);
+        }
+        e.preventDefault();
+    });
+
+    function writeUserData(name, email) {
+      var user_data = {
+            username: name,
+            email: email,
+        };
+
+        var newUser = firebase.database().ref().child('users').push(user_data, function (error) {
+            if(error) {
+                console.log(error);
+            } else {
+                var msg = 'User added successfully!';
+                var msg_type = 'success';
+                msgAlert(msg, msg_type)
+            }
+        });
+    }
+
+    function msgAlert(msg, msg_type) {
+        toastr.options = {
+            "debug": false,
+            "newestOnTop": false,
+            "positionClass": "toast-top-center",
+            "closeButton": true,
+            "toastClass": "animated fadeInDown",
+        };
+        if (msg_type == 'success') {
+            toastr.success(msg);
+        } else if (msg_type == 'error') {
+            toastr.error(msg);
+        }
+
+    }
+</script>
+
+</body>
+
+</html>
